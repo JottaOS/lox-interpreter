@@ -1,0 +1,15 @@
+{
+  "name": "lox-interpreter",
+  "description": "A Lox programming language interpreter written in Typescript. Based on the book Crafting Interpreters",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run app/main.ts",
+    "tokenize": "bun run app/main.ts tokenize ~/lox-interpreter/tests/test.lox"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "bun": "^1.2.19"
+  }
+}
