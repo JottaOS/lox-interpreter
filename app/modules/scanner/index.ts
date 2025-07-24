@@ -1,6 +1,7 @@
 import { Lox } from "../lox";
 import { Token } from "../tokens";
 import { TokenType } from "../tokens/types";
+import { RESERVED_IDENTIFIERS } from "./constants";
 
 export class Scanner {
   private source: string;
@@ -113,15 +114,13 @@ export class Scanner {
       default:
         if (this.isDigit(char)) {
           this.number();
+        } else if (this.isAlpha(char)) {
+          this.identifier();
         } else {
           this.lox.error(this.line, `Unexpected character: ${char}`);
         }
         break;
     }
-  }
-
-  private isDigit(value: string) {
-    return value >= "0" && value <= "9";
   }
 
   private advance(): string {
@@ -187,11 +186,41 @@ export class Scanner {
     }
   }
 
+  private identifier(): void {
+    while (this.isAlphaNumeric(this.peek())) this.advance();
+
+    // check if identifier is reserved
+    const text = this.source.substring(this.start, this.current);
+    const tokenType = RESERVED_IDENTIFIERS.get(text);
+
+    this.addToken(tokenType || TokenType.IDENTIFIER);
+  }
+
   private match(expected: string): boolean {
     if (this.isAtEnd()) return false;
     if (this.source.charAt(this.current) !== expected) return false;
 
     this.current++;
     return true;
+  }
+
+  // :::
+  // HELPERS
+  // :::
+
+  private isAlpha(char: string): boolean {
+    return (
+      (char >= "a" && char <= "z") ||
+      (char >= "A" && char <= "Z") ||
+      char == "_"
+    );
+  }
+
+  private isAlphaNumeric(char: string): boolean {
+    return this.isAlpha(char) || this.isDigit(char);
+  }
+
+  private isDigit(value: string) {
+    return value >= "0" && value <= "9";
   }
 }
