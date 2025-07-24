@@ -32,7 +32,7 @@ export class Scanner {
     return this.tokens;
   }
 
-  private addToken(type: TokenType, literal: string | null = null): void {
+  private addToken(type: TokenType, literal: any = null): void {
     const text = this.source.substring(this.start, this.current);
     this.tokens.push(
       new Token({ type, lexeme: text, literal, line: this.line })
@@ -93,25 +93,15 @@ export class Scanner {
         );
         break;
       case "/":
-        this.match("/") ? this.ignoreComment() : this.addToken(TokenType.SLASH);
+        if (this.match("/")) {
+          // ignore comment
+          while (this.peek() !== "\n" && !this.isAtEnd()) this.advance();
+        } else {
+          this.addToken(TokenType.SLASH);
+        }
         break;
       case '"':
-        while (!this.isAtEnd()) {
-          const char = this.advance();
-          if (char === "\n") {
-            this.lox.error(this.line, "Unterminated string");
-            break;
-          }
-
-          if (char === '"') {
-            const literal = this.source.substring(
-              this.start + 1,
-              this.current - 1
-            );
-            this.addToken(TokenType.STRING, literal);
-            break;
-          }
-        }
+        this.string();
         break;
       case " ":
       case "\t":
@@ -121,9 +111,17 @@ export class Scanner {
         this.line++;
         break;
       default:
-        this.lox.error(this.line, `Unexpected character: ${char}`);
+        if (this.isDigit(char)) {
+          this.number();
+        } else {
+          this.lox.error(this.line, `Unexpected character: ${char}`);
+        }
         break;
     }
+  }
+
+  private isDigit(value: string) {
+    return value >= "0" && value <= "9";
   }
 
   private advance(): string {
@@ -132,10 +130,60 @@ export class Scanner {
     return this.source.charAt(this.current++);
   }
 
-  private ignoreComment(): void {
+  private peek(): string {
+    if (this.isAtEnd()) return "\0";
+
+    return this.source.charAt(this.current);
+  }
+
+  private peekNext(): string {
+    const nextCurrent = this.current + 1;
+    if (nextCurrent >= this.source.length) return "\0";
+
+    return this.source.charAt(nextCurrent);
+  }
+
+  private number(): void {
+    // Continue until end of source or non-digit character
+    while (this.isDigit(this.peek())) this.advance();
+
+    let hasDecimals = false;
+    let decimalValue = 0;
+    if (this.peek() === "." && this.isDigit(this.peekNext())) {
+      // consume the "."
+      this.advance();
+      const firstDecimalIndex = this.current;
+      hasDecimals = true;
+      while (this.isDigit(this.peek())) this.advance();
+
+      decimalValue = parseInt(
+        this.source.substring(firstDecimalIndex, this.current - 1)
+      );
+    }
+
+    this.addToken(
+      TokenType.NUMBER,
+      hasDecimals && decimalValue > 0
+        ? parseFloat(this.source.substring(this.start, this.current))
+        : parseFloat(this.source.substring(this.start, this.current)).toFixed(1)
+    );
+  }
+
+  private string(): void {
     while (!this.isAtEnd()) {
       const char = this.advance();
-      if (char === "\n") return;
+
+      if (char === "\n") {
+        this.lox.error(this.line, "Unterminated string");
+        this.line++;
+        break;
+      }
+
+      if (char === '"') {
+        const literal = this.source.substring(this.start + 1, this.current - 1);
+        this.addToken(TokenType.STRING, literal);
+        break;
+      }
     }
   }
 

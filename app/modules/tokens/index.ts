@@ -3,7 +3,7 @@ import type { IToken, TokenType } from "./types";
 export class Token {
   private type: TokenType;
   private lexeme: string;
-  private literal: string | null;
+  private literal: any;
   private line: number;
 
   constructor(params: IToken) {

@@ -52,6 +52,6 @@ export enum TokenType {
 export interface IToken {
   type: TokenType;
   lexeme: string;
-  literal: string | null;
+  literal: any;
   line: number;
 }

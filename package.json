@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run app/main.ts",
-    "tokenize": "bun run app/main.ts tokenize ~/lox-interpreter/tests/test.lox"
+    "tokenize": "bun run app/main.ts tokenize ~/Documents/lox-interpreter/tests/test.lox"
   },
   "devDependencies": {
     "@types/bun": "latest"
