@@ -95,8 +95,10 @@ export class Scanner {
         break;
       case "/":
         if (this.match("/")) {
-          // ignore comment
           while (this.peek() !== "\n" && !this.isAtEnd()) this.advance();
+        }
+        else if (this.match("*")) {
+          this.blockComment();
         } else {
           this.addToken(TokenType.SLASH);
         }
@@ -120,6 +122,18 @@ export class Scanner {
           this.lox.error(this.line, `Unexpected character: ${char}`);
         }
         break;
+    }
+  }
+
+  private blockComment(): void {
+    while (!(this.peek() === "*" && this.peekNext() === "/") && !this.isAtEnd()){
+      this.advance();
+    }
+    if (this.peekNext() === "/") {
+      // consume asterisk and slash
+      this.advance();
+      this.advance();
+      return;
     }
   }
 

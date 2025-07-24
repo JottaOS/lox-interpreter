@@ -36,3 +36,14 @@ _hello          // IDENTIFIER _hello null
 
 1hola           // NUMBER 1 1.0
                 // IDENTIFIER hola null
+
+// reserved identifiers
+or              // OR or null
+orchid          // IDENTIFIER orchid null
+and_variable    // IDENTIFIER and_variable null
+.class          // DOT . null
+                // CLASS class null
+return test     // RETURN return null
+                // IDENTIFIER test null
+
+EOF null

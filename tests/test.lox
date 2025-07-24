@@ -1,5 +1,11 @@
-or
-orchid
-and_variable
-.class
+/* block commment */
+/*
+multi
+* block
+* line
+* many
+* newlines
+
+
+*/
 return test
