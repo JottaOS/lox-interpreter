@@ -96,8 +96,7 @@ export class Scanner {
       case "/":
         if (this.match("/")) {
           while (this.peek() !== "\n" && !this.isAtEnd()) this.advance();
-        }
-        else if (this.match("*")) {
+        } else if (this.match("*")) {
           this.blockComment();
         } else {
           this.addToken(TokenType.SLASH);
@@ -126,7 +125,11 @@ export class Scanner {
   }
 
   private blockComment(): void {
-    while (!(this.peek() === "*" && this.peekNext() === "/") && !this.isAtEnd()){
+    while (
+      !(this.peek() === "*" && this.peekNext() === "/") &&
+      !this.isAtEnd()
+    ) {
+      if (this.peek() === "\n") this.line++;
       this.advance();
     }
     if (this.peekNext() === "/") {
